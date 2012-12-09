@@ -116,6 +116,16 @@
 (defvar systemtap-buffer-name "*SystemTap*"
   "Name of the SystemTap execution buffer.")
 
+(defcustom systemtap-stap-program "stap"
+  "SystemTap's stap program to execute scripts."
+  :type 'file
+  :group 'systemtap-mode)
+
+(defcustom systemtap-stap-options '("-v")
+  "A list of options to give to stap."
+  :type '(repeat string)
+  :group 'systemtap-mode)
+
 (defun systemtap-execute-script ()
   "Execute current SystemTap script."
   (interactive)
@@ -123,8 +133,10 @@
     (kill-buffer systemtap-buffer-name))
   (get-buffer-create systemtap-buffer-name)
   (display-buffer systemtap-buffer-name)
-  (start-process "systemtap-script" systemtap-buffer-name
-                 "stap" "-v" (expand-file-name (buffer-name (window-buffer))))
+  (let* ((file-name (buffer-file-name))
+         (options (append systemtap-stap-options (list file-name))))
+    (apply #'start-process "systemtap-script" systemtap-buffer-name
+           systemtap-stap-program options))
   (message "Execution of SystemTap script started."))
 
 (defun systemtap-interrupt-script ()
