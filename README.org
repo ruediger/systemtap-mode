@@ -1,0 +1,31 @@
+# -*- mode:org; mode:auto-fill; fill-column:80; coding:utf-8; -*-
+#+TITLE: systemtap-mode --- A mode for SystemTap
+
+systemtap-mode is a mode for [[http://sourceware.org/systemtap/][SystemTap]].  It allows writing and executing
+SystemStap scripts.
+
+It is forked from Tomoki Sekiyama's initial [[http://coderepos.org/share/browser/lang/elisp/systemtap-mode/systemtap-mode.el?format=txt][systemtap-mode]] implementation.  The
+implementation is based on =cc-mode=.
+
+* Installation
+Copy the file =systemtap-mode.el= to a directory in your =load-path=.  You can
+use =update-file-autoloads= to create the proper autoloads from the file or
+simply add
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.stp\\'" . systemtap-mode))
+(autoload 'systemtap-mode "systemtap-mode.el")
+#+END_SRC
+
+to your =init.el=.
+
+I'll try to make systemtap-mode available via =el-get= and =package.el=.
+
+* Usage
+After installation the mode should be automatically started for files with
+=.stp= suffix.  You can run the script with =C-c e= and interrupt it with =C-c
+c=.
+
+* To Do
+** TODO Indent embedded-C =%{ ... %}= correctly
+** TODO Support documentation/autocomplete (=stap -L=)
