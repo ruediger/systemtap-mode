@@ -1,34 +1,62 @@
-;;; SystemTap-mode based on cc-mode
-;;; (c) 2008 Tomoki Sekiyama <sekiyama@yahoo.co.jp>
+;;; systemtap-mode.el --- A mode for SystemTap
+
+;; Copyright (C) 2008 Tomoki Sekiyama <sekiyama@yahoo.co.jp>
+;; Copyright (C) 2012 Rüdiger Sonderfeld <ruediger@c-plusplus.de>
+
+;; Authors:    2008 Tomoki Sekiyama
+;;             2012 Rüdiger Sonderfeld
+;; Maintainer: ruediger@c-plusplus.de
+;; Keywords:   tools languages
+
+;; This file is NOT part of GNU Emacs.
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2 of the License,or
 ;; (at your option) any later version.
 ;; 
-;; This program is distributed in the hope that it will be useful,n;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 ;; 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; see the file COPYING.  If not,write to
-;; the Free Software Foundation,Inc.,59 Temple Place - Suite 330,n;; Boston,MA 02111-1307,USA.
+;; the Free Software Foundation,Inc.,59 Temple Place - Suite 330,
+;; Boston,MA 02111-1307,USA.
+
+;;; Commentary:
+
+;; This code is based on the original systemtap-mode.el written by
+;; Tomoki Sekiyama.  It can be found at
+;; http://coderepos.org/share/browser/lang/elisp/systemtap-mode/systemtap-mode.el?format=txt
+
+;;; Code:
 
 (defconst systemtap-mode-version "0.01"
   "SystemTap Mode version number.")
 
+(defgroup systemtap-mode nil
+  "A mode for SystemTap"
+  :prefix "systemtap-"
+  :group 'tools
+  :group 'languages)
+
 ;;
-;; Usage:n;;   Add below to your ~/.emacs file.
+;; Usage:
+;;   Add below to your ~/.emacs file.
 ;;
 ;;  (autoload 'systemtap-mode "systemtap-mode")
-;;  (add-to-list 'auto-mode-alist '("¥¥.stp¥¥'" . systemtap-mode))
+;;  (add-to-list 'auto-mode-alist '("\\.stp\\'" . systemtap-mode))
 ;;
-;; Note:n;;   The interface used in this file requires CC Mode 5.30 or
+;; Note:
+;;   The interface used in this file requires CC Mode 5.30 or
 ;;   later.
 ;;   Only tested in emacs 22.
 ;;
 
-;; TODO:n;;   - indent embedded-C %{ ... %} correctly
+;; TODO:
+;;   - indent embedded-C %{ ... %} correctly
 ;;   - add parameter for indentation
 ;;   - ...
 
@@ -45,20 +73,20 @@
 ;; Syntax definitions for systemtap
 
 (c-lang-defconst c-primitive-type-kwds
-				 systemtap '("string" "long" "function" "global" "probe"))
+  systemtap '("string" "long" "function" "global" "probe"))
 
 (c-lang-defconst c-block-stmt-2-kwds
-				 systemtap '("else" "for" "foreach" "if" "while"))
+  systemtap '("else" "for" "foreach" "if" "while"))
 
 (c-lang-defconst c-simple-stmt-kwds
-				 systemtap '("break" "continue" "delete" "next" "return"))
+  systemtap '("break" "continue" "delete" "next" "return"))
 
 (c-lang-defconst c-cpp-matchers
-				 systemtap (cons
-			 '(eval . (list "^¥¥s *¥¥(#pragma¥¥)¥¥>¥¥(.*¥¥)"
-							(list 1 c-preprocessor-face-name)
-							'(2 font-lock-string-face)))
-			 (c-lang-const c-cpp-matchers)))
+  systemtap (cons
+             '(eval . (list "^\\s *\\(#pragma\\)\\>\\(.*\\)"
+                            (list 1 c-preprocessor-face-name)
+                            '(2 font-lock-string-face)))
+             (c-lang-const c-cpp-matchers)))
 
 (c-lang-defconst c-identifier-syntax-modifications
   systemtap '((?. . "_") (?' . ".")))
@@ -66,10 +94,11 @@
   "Syntax table used in systemtap-mode buffers.")
 (or systemtap-mode-syntax-table
     (setq systemtap-mode-syntax-table
-		  (funcall (c-lang-const c-make-mode-syntax-table systemtap))))
+          (funcall (c-lang-const c-make-mode-syntax-table systemtap))))
 
 (defcustom systemtap-font-lock-extra-types nil
-  "font-lock extra types for SystemTap mode")
+  "font-lock extra types for SystemTap mode"
+  :group 'systemtap-mode)
 
 (defconst systemtap-font-lock-keywords-1 (c-lang-const c-matchers-1 systemtap)
   "Minimal highlighting for SystemTap mode.")
@@ -89,18 +118,18 @@
 
 (defvar systemtap-mode-map
   (let ((map (c-make-inherited-keymap)))
-	(define-key map "¥C-ce" 'execute-systemtap-script)
-	(define-key map "¥C-cc" 'interrupt-systemtap-script)
-	map)
+    (define-key map "\C-ce" 'execute-systemtap-script)
+    (define-key map "\C-cc" 'interrupt-systemtap-script)
+    map)
   "Keymap used in systemtap-mode buffers.")
 
 (easy-menu-define systemtap-menu systemtap-mode-map "SystemTap Mode Commands"
   (cons "SystemTap"
-		(append
-		 '(["Execute This Script" execute-systemtap-script t]
-		   ["Interrupt Execution of Script" interrupt-systemtap-script (get-process "systemtap-script")]
-		   "----")
-		 (c-lang-const c-mode-menu systemtap))))
+        (append
+         '(["Execute This Script" execute-systemtap-script t]
+           ["Interrupt Execution of Script" interrupt-systemtap-script (get-process "systemtap-script")]
+           "----")
+         (c-lang-const c-mode-menu systemtap))))
 
 ;;;###autoload
 
@@ -114,11 +143,11 @@
   "Execute current SystemTap script"
   (interactive)
   (if (get-buffer systemtap-buffer-name)
-	  (kill-buffer systemtap-buffer-name))
+      (kill-buffer systemtap-buffer-name))
   (get-buffer-create systemtap-buffer-name)
   (display-buffer systemtap-buffer-name)
   (start-process "systemtap-script" systemtap-buffer-name
-				 "stap" "-v" (expand-file-name (buffer-name (window-buffer))))
+                 "stap" "-v" (expand-file-name (buffer-name (window-buffer))))
   (message "execution of SystemTap script started."))
 
 (defun interrupt-systemtap-script ()
@@ -133,15 +162,16 @@
 (defun systemtap-mode ()
   "Major mode for editing SystemTap script.
 
-Key bindings:n¥¥{systemtap-mode-map}"
+Key bindings:
+\\{systemtap-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (c-initialize-cc-mode t)
   (set-syntax-table systemtap-mode-syntax-table)
   (setq major-mode 'systemtap-mode
-		mode-name "SystemTap"
-		local-abbrev-table systemtap-mode-abbrev-table
-		abbrev-mode t)
+        mode-name "SystemTap"
+        local-abbrev-table systemtap-mode-abbrev-table
+        abbrev-mode t)
   (use-local-map systemtap-mode-map)
   (c-init-language-vars systemtap-mode)
   (c-common-init 'systemtap-mode)
@@ -150,5 +180,6 @@ Key bindings:n¥¥{systemtap-mode-map}"
   (run-hooks 'systemtap-mode-hook)
   (c-update-modeline))
 
-
 (provide 'systemtap-mode)
+
+;;; systemtap-mode.el ends here
