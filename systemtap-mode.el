@@ -7,6 +7,8 @@
 ;;             2012 Rüdiger Sonderfeld
 ;; Maintainer: ruediger@c-plusplus.de
 ;; Keywords:   tools languages
+;; Version:    0.02
+;; URL:        https://github.com/ruediger/systemtap-mode
 
 ;; This file is NOT part of GNU Emacs.
 
