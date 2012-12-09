@@ -48,10 +48,10 @@
   :group 'languages)
 
 (require 'cc-mode)
+(require 'cc-awk)
 (eval-when-compile
   (require 'cc-langs)
-  (require 'cc-fonts)
-  (require 'cc-awk))
+  (require 'cc-fonts))
 
 (eval-and-compile
   (c-add-language 'systemtap-mode 'awk-mode))
@@ -136,6 +136,8 @@
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("\\.stp\\'" . systemtap-mode))
 
+(require 'simple)
+
 ;;;###autoload
 (define-derived-mode systemtap-mode prog-mode "SystemTap"
   "Major mode for editing SystemTap scripts.
@@ -143,11 +145,11 @@
 Key bindings:
 \\{systemtap-mode-map}"
   :group 'systemtap
-  :syntax-table 'systemtap-mode-syntax-table
-  :abbrev-table 'systemtap-mode-abbrev-table
+  :syntax-table systemtap-mode-syntax-table
+  :abbrev-table systemtap-mode-abbrev-table
   (c-initialize-cc-mode t)
   (use-local-map systemtap-mode-map)
-  (c-init-language-vars 'systemtap-mode)
+  (c-init-language-vars systemtap-mode)
   (c-common-init 'systemtap-mode)
   (easy-menu-add systemtap-menu)
   (c-run-mode-hooks 'c-mode-common-hook)
