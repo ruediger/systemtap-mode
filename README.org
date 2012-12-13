@@ -8,7 +8,8 @@ It is forked from Tomoki Sekiyama's initial [[http://coderepos.org/share/browser
 implementation is based on =cc-mode=.
 
 * Installation
-Systemtap-mode can be installed via [[https://github.com/dimitri/el-get][el-get]] or =package.el= using [[http://marmalade-repo.org/packages/systemtap-mode][Marmalade]].
+Systemtap-mode can be installed via [[https://github.com/dimitri/el-get][el-get]] or =package.el= using [[http://marmalade-repo.org/packages/systemtap-mode][Marmalade]]
+(releases) or [[http://melpa.milkbox.net/][MELPA]] (snapshots).
 
 You can install it manually by copying the file =systemtap-mode.el= to a
 directory in your =load-path=.  You can use =update-file-autoloads= to create
