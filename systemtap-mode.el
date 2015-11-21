@@ -55,6 +55,11 @@
   (require 'cc-langs)
   (require 'cc-fonts))
 
+;; Work around emacs bug#18845
+(eval-and-compile
+  (when (and (= emacs-major-version 24) (>= emacs-minor-version 4))
+    (require 'cl)))
+
 (eval-and-compile
   (c-add-language 'systemtap-mode 'awk-mode))
 
